@@ -25,8 +25,8 @@ eksctl create addon --name aws-ebs-csi-driver --cluster <YOUR-CLUSTER-NAME> --se
 
 **References**:
 https://repost.aws/knowledge-center/eks-persistent-storage
-------------------------------------------------------------------------------------------------------------------------------------
-
+------------------------------------------------------------------------------------------
+**IN MY CASE**
 **ADDRESS NOT REFLECTING IN INGRESS resource after KUBECTL APPLY INGRESS**----------------------------------
 
 **SOLUTION**
@@ -52,7 +52,7 @@ Resource: VPC arn:aws:ec2:us-east-1:142000000:vpc/vpc-092d100000000
 
 This means the IAM role AmazonEKSLoadBalancerControllerRole does not have the ec2:CreateSecurityGroup permission — which is required for the controller to set up ALB-related security groups.
 
-🔧 Steps to Fix
+**🔧 Steps to Fix**
 1. Download AWS-recommended IAM policy
 Run this command to get the latest recommended policy from AWS:
 
