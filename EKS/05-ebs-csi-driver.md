@@ -25,3 +25,64 @@ eksctl create addon --name aws-ebs-csi-driver --cluster <YOUR-CLUSTER-NAME> --se
 
 **References**:
 https://repost.aws/knowledge-center/eks-persistent-storage
+------------------------------------------------------------------------------------------------------------------------------------
+
+**ADDRESS NOT REFLECTING IN INGRESS resource after KUBECTL APPLY INGRESS**----------------------------------
+
+**SOLUTION**
+
+**Encountered IAM Role Issue** -->In my case 
+
+4. IAM Role issue?
+Ensure the IAM role associated with the AWS Load Balancer Controller has the correct policy attached.
+
+You can check with:
+
+kubectl describe serviceaccount aws-load-balancer-controller -n kube-system
+
+
+**** Your AWS Load Balancer Controller is failing because of a missing IAM permission**:**
+
+
+❌ Error Summary:
+
+UnauthorizedOperation: You are not authorized to perform this operation. 
+Action: ec2:CreateSecurityGroup 
+Resource: VPC arn:aws:ec2:us-east-1:142000000:vpc/vpc-092d100000000
+
+This means the IAM role AmazonEKSLoadBalancerControllerRole does not have the ec2:CreateSecurityGroup permission — which is required for the controller to set up ALB-related security groups.
+
+🔧 Steps to Fix
+1. Download AWS-recommended IAM policy
+Run this command to get the latest recommended policy from AWS:
+
+curl -o iam_policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/main/docs/install/iam_policy.json
+
+2. Attach the policy to the IAM Role
+
+If your IAM role is named AmazonEKSLoadBalancerControllerRole, use:
+
+aws iam put-role-policy \
+  --role-name AmazonEKSLoadBalancerControllerRole \
+  --policy-name AWSLoadBalancerControllerIAMPolicy \
+  --policy-document file://iam_policy.json
+📌 Note: Make sure your terminal is configured with an IAM user that has permission to update IAM roles (e.g., via aws configure or EC2 instance profile).
+
+
+
+4. Re-deploy or restart the controller
+You can restart the pod to retry:
+
+kubectl delete pod -n kube-system -l app.kubernetes.io/name=aws-load-balancer-controller
+
+
+NOW ADDRESS (**DNS name of the AWS Load Balancer (ALB)** ) REFLECTS IN INGRESS ,, U CAN ACCESS VIA BROWSER
+
+
+
+
+
+
+
+
+
